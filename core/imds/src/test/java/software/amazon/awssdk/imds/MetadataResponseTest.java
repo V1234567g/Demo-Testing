@@ -16,6 +16,7 @@
 package software.amazon.awssdk.imds;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.isA;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public class MetadataResponseTest {
         thrown.expectMessage("Metadata is null");
 
         MetadataResponse metadataResponse = new MetadataResponse(null);
-        String result = metadataResponse.asString();
+        metadataResponse.asString();
     }
 
     @Test
@@ -64,7 +65,6 @@ public class MetadataResponseTest {
         MetadataResponse metadataResponse = new MetadataResponse(response);
         List<String> result = metadataResponse.asList();
         assertThat(result).hasSize(2);
-
     }
 
     @Test
@@ -75,8 +75,8 @@ public class MetadataResponseTest {
         MetadataResponse metadataResponse = new MetadataResponse(response);
         List<String> result = metadataResponse.asList();
         assertThat(result).hasSize(1);
-
     }
+
     @Test
     public void check_asList_failure() throws IOException {
 
@@ -84,7 +84,7 @@ public class MetadataResponseTest {
         thrown.expectMessage("Metadata is null");
 
         MetadataResponse metadataResponse = new MetadataResponse(null);
-        List<String> result = metadataResponse.asList();
+        metadataResponse.asList();
     }
 
     @Test
@@ -93,8 +93,7 @@ public class MetadataResponseTest {
         thrown.expectMessage("Metadata is null");
 
         MetadataResponse metadataResponse = new MetadataResponse(null);
-        Document document = metadataResponse.asDocument();
-
+        metadataResponse.asDocument();
     }
 
     @Test
@@ -116,6 +115,14 @@ public class MetadataResponseTest {
         expectedMap.put("devpayProductCodes", Document.fromList(documentList));
         Document expectedDocumentMap = Document.fromMap(expectedMap);
         assertThat(document).isEqualTo(expectedDocumentMap);
+    }
+
+    @Test
+    public void toDocument_nonJsonFormat_ExpectIllegalArgument() {
+        thrown.expectCause(isA(IllegalArgumentException.class));
+        String malformed = "this is not json";
+        MetadataResponse metadataResponse = new MetadataResponse(malformed);
+        metadataResponse.asDocument();
     }
 
 }
